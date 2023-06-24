@@ -12,14 +12,11 @@ import { esTelefonoValido, esFechaValida, esValidoDNI, esValidoEmail, esValidoCI
 import { development } from './knexfile.js';
 import passport from 'passport';
 import session from 'express-session';
-import strategyInit from './lib/AuthStrategy.js';
-import strategyInit2 from './lib/AuthStrategy2.js';
-import strategyInit3 from './lib/AuthStrategy3.js';
-
+import strategyInitGeneral from './lib/AuthStrategyGeneral.js';
 // Instanciamos Express y el middleware de JSON y CORS -
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({credentials:true,origin:'http://localhost:3000'}));
 
 // Conexiones a la base de datos
 const dbConnection = Knex(development);
@@ -35,17 +32,20 @@ Administrador.knex(dbConnection);
 // * ========================================================================================================================================= 
 
 // TODO Inicialización del passport CLIENTE ===================================================================================================
+
 app.use(session({
     secret: 'cines-session-cookie-key', // Secreto de la sesión (puede ser cualquier identificador unívoco de la app, no es público al usuario)
-    name: 'SessionCookie.SID', // Nombre de la sesión
+    name: 'SessionCookie', // Nombre de la sesión
     resave: true,
     saveUninitialized: false,
+    cookie: {
+      secure: false,
+      maxAge: 3600000000, // Expiración de la sesión
+  },
 }));
-app.use(passport.initialize()); // passport.initialize() inicializa Passport
-app.use(passport.session()); // passport.session() indica a Passport que usará sesiones
-strategyInit(passport);
-strategyInit2(passport);
-strategyInit3(passport);
+app.use(passport.initialize());
+app.use(passport.session());
+strategyInitGeneral(passport);
 
 
 // * ========================================================================================================================================= 
@@ -54,32 +54,23 @@ strategyInit3(passport);
 
 // TODO Endpoint: POST /LOGIN  CLIENTE ================================================================================================
 
-app.post('/login', passport.authenticate('localCliente'), (req, res) => {
+app.post('/login', passport.authenticate('localGeneral'), (req, res) => {
     if (!!req.user) res.status(200).json(req.user) 
     else res.status(500).json({status: "error"})
 });
 
-// TODO Endpoint: POST /LOGIN EMPRESA ================================================================================================
-app.post('/loginEmpresa', passport.authenticate('localEmpresa'), (req, res) => {
+app.get('/user', (req, res) => {
   if (!!req.user) res.status(200).json(req.user) 
   else res.status(500).json({status: "error"})
 });
-
-// TODO Endpoint: POST /LOGIN  ADMIN ================================================================================================
-app.post('/loginAdmin', passport.authenticate('localAdmin'), (req, res) => {
-  if (!!req.user) res.status(200).json(req.user) 
-  else res.status(500).json({status: "error"})
-});
-
-
-
 
 // * ========================================================================================================================================= 
 // * =======================================================================  CLIENTE ======================================================== 
 // * ========================================================================================================================================= 
 
 // TODO Endpoint: POST /REGISTRAR CLIENTE --> Ok  ============================================================================================
-app.post('/registrarCliente', async (req, res) => {
+app.post('/registrarCliente', (req, res) => {
+    console.log(req.body)
     const { nombre, email, password, dni, fecha, telefono } = req.body;
   
     //^ Validar que se proporcionen todos los campos requeridos
@@ -130,7 +121,8 @@ app.post('/borrarCliente', async (req, res) => {
 // * ========================================================================================================================================= 
 
 // TODO Endpoint: POST /REGISTRAR EMPRESA --> Ok  ============================================================================================
-app.post('/registrarEmpresa', async (req, res) => {
+app.post('/registrarEmpresa', (req, res) => {
+
   const { nombre, email, password, cif, puerto, telefono, responsable, euros} = req.body;
 
   //^ Validar que se proporcionen todos los campos requeridos 
@@ -163,7 +155,19 @@ app.post('/registrarEmpresa', async (req, res) => {
   telefono: Number(telefono),
   responsable,
   euros: Number(euros)
-  }).then(results => res.status(200).json({status: "Ok"})).catch(err => res.status(500).json({error: err}));
+  }).then(results => res.status(200).json({status: "Ok"})).catch(err => {res.status(500).json({error: err}); console.log(err)});
+});
+
+app.get('/empresas',(req,res)=>{
+  if(!!req.user){
+    if(!!req.user.rol === "admin"){
+        Empresa.query().then(resultado => res.json(resultado)).catch(err=> res.status(500).json({error:err}));
+    }else{
+      res.status(401).json({error:'No autorizado'});
+    }
+  }else{
+    res.status(401).json({error:'No autenticado'});
+  }
 });
 
 

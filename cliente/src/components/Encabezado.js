@@ -4,6 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState,useContext } from "react";
 import { TemaContext } from "../App";
+import PersonIcon from '@mui/icons-material/Person';
 
 export default function Encabezado(){
 
@@ -56,10 +57,15 @@ export default function Encabezado(){
             <MenuItem onClick={handleClose}><Typography variant="h5">Test</Typography></MenuItem>
         </MenuList>
       </Menu>
+      
         <Typography variant = "h2"
         sx = {{
             color: tema.secondary,
-            fontWeight:"bold"
+            fontWeight:"bold",
+            fontFamily: 'Retro Delight'
         }}> 7Mares</Typography>
+        <IconButton sx={{marginLeft:"auto"}}>
+        Identificate <PersonIcon/>  
+      </IconButton>
     </AppBar>
 }

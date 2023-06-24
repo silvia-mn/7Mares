@@ -1,20 +1,22 @@
-
-import CrucerosTable from './pages/CrucerosPage/components/CrucerosTable.component';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import './App.css';
-import VistaEmpresas from './pages/AdminPage/VistaEmpresas';
-import LoginAdmin from './pages/AdminPage/LoginAdmin';
-import RegistroEmpresas from './pages/EmpresasPage/RegistroEmpresas';
-import RegistroClientes from './pages/ClientesPage/RegistroClientes';
-import RegistroCruceros from './pages/CrucerosPage/RegistroCruceros';
+import Inicio from "./pages/Inicio"
+import Encabezado from "./components/Encabezado";
+
+import { createContext } from 'react';
+import {tema} from './tema';
+
+export const TemaContext = createContext(tema)
 
 function App() {
   return (
+    <TemaContext.Provider value={tema}>
+    <Encabezado/>
     <Router>
       <Routes>
-        <Route path="/" index element={<RegistroEmpresas/>}/>
+        <Route path="/inicio" index element={<Inicio/>}/>
       </Routes>  
     </Router>
+    </TemaContext.Provider>
   )
 }
 

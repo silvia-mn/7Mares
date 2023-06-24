@@ -3,6 +3,8 @@
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import RegistroClienteForm from './components/RegistroClienteForm';
 import RegistroEmpresaForm from './components/RegistroEmpresaForm';
+import TablaCruceros from './components/TablaCruceros';
+import RegistroCruceroForm from "./components/RegistroCruceroForm";
 
 import Inicio from "./pages/Inicio"
 import Encabezado from "./components/Encabezado";
@@ -46,8 +48,14 @@ function App() {
 
         <Route path="/registrar/usuario" index element={<RegistroClienteForm/>}/>
         <Route path="/registrar/empresa" index element={<RegistroEmpresaForm/>}/>
+        <Route path="/registrar/crucero" index element={<RegistroCruceroForm/>}/>
         <Route path="/inicio" index element={<Inicio/>}/>
+
+        <Route path="/cruceros" index element={<TablaCruceros/>}/>
+
+
         <Route path="/login" index element={<Login/>}/>
+
       </Routes>  
     </Router>
     </TemaContext.Provider>

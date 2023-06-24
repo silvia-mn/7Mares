@@ -1,18 +1,15 @@
 
-import CrucerosTable from './pages/CrucerosPage/components/CrucerosTable.component';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import './App.css';
-import VistaEmpresas from './pages/AdminPage/VistaEmpresas';
-import LoginAdmin from './pages/AdminPage/LoginAdmin';
-import RegistroEmpresas from './pages/EmpresasPage/RegistroEmpresas';
-import RegistroClientes from './pages/ClientesPage/RegistroClientes';
-import RegistroCruceros from './pages/CrucerosPage/RegistroCruceros';
+import RegistroClienteForm from './components/RegistroClienteForm';
+import RegistroEmpresaForm from './components/RegistroEmpresaForm';
+
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" index element={<RegistroEmpresas/>}/>
+        <Route path="/registrar/usuario" index element={<RegistroClienteForm/>}/>
+        <Route path="/registrar/empresa" index element={<RegistroEmpresaForm/>}/>
       </Routes>  
     </Router>
   )

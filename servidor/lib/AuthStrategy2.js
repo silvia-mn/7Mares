@@ -15,7 +15,7 @@ export const strategyInit2 = passport => {
         user.verifyPassword(String(password), ((err, passwordIsCorrect) => { // Si existe, validar contraseña
           if (!!err) return done(err); // Si la validación contiene error, devolver callback con error
           if (!passwordIsCorrect) return done(null, false); // Si la contraseña no es válida, devolver callback sin usuario
-          return done(null, user); // Si la contraseña es válida, devolver callback con empresa
+          return done(null, {...user,rol:'empresa'}); // Si la contraseña es válida, devolver callback con empresa
         }))
       }).catch(function (err) {
         done(err) // Si se captura alguna excepción no controlada, devolver callback con error

@@ -28,19 +28,18 @@ export default function RegistrationFormU(props) {
       apellido2,
       email,
       dni,
-      fechanacimiento,
+      fecha : fechanacimiento,
       telefono,
       password
     };
-    const data = { user };
     axios
-      .post('http://localhost:8080/registrarCliente', data)
+      .post('http://localhost:8080/registrarCliente', user)
       .then((response) => {
         console.log(response.data);
         navigate('/inicio');
       })
       .catch((error) => {
-        setErrorMessage("Se ha producido un error");
+        setErrorMessage(!! error?.response?.data?.mensaje ?  error.response.data.mensaje : "Se ha producido un error" );
         setError(true);
       });
 };

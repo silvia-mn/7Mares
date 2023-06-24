@@ -21,7 +21,7 @@ export default function RegistrationFormP() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const promoter = {
+    const empresa = {
       nombre,
       responsable,
       puerto,
@@ -31,14 +31,13 @@ export default function RegistrationFormP() {
       telefono,
       password
     };
-    const data = { promoter };
     axios
-      .post('http://localhost:8080/registrarEmpresa', data)
+      .post('http://localhost:8080/registrarEmpresa', empresa)
       .then((response) => {
         navigate('/inicio')
       })
       .catch((error) => {
-        setErrorMessage("Se ha producido un error");
+        setErrorMessage(!! error?.response?.data?.mensaje ?  error.response.data.mensaje : "Se ha producido un error" );
         setError(true);
       });
 };

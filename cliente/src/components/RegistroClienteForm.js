@@ -14,7 +14,7 @@ export default function RegistrationFormU(props) {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const maxDate = new Date().toISOString().split("T")[0];
-
+  
   const [errorMessage, setErrorMessage] = React.useState('');
   const [error, setError] = React.useState(false);
 
@@ -32,16 +32,36 @@ export default function RegistrationFormU(props) {
       telefono,
       password
     };
-    axios
-      .post('http://localhost:8080/registrarCliente', user)
-      .then((response) => {
-        console.log(response.data);
-        navigate('/inicio');
-      })
-      .catch((error) => {
-        setErrorMessage(!! error?.response?.data?.mensaje ?  error.response.data.mensaje : "Se ha producido un error" );
-        setError(true);
-      });
+
+    function getEdad(dateString) {
+      const hoy = new Date()
+      const fechanacimiento = new Date(dateString)
+      const edad = hoy.getFullYear() - fechanacimiento.getFullYear()
+      const diferenciaMeses = hoy.getMonth() - fechanacimiento.getMonth()
+      if (
+        diferenciaMeses < 0 ||
+        (diferenciaMeses === 0 && hoy.getDate() < fechanacimiento.getDate())
+      ) {
+        edad--
+      }
+      return edad
+    }
+
+    if (getEdad(fechanacimiento) < 18){
+      setErrorMessage(!! error?.response?.data?.mensaje ?  error.response.data.mensaje : "El usuario debe de ser mayor de 18 años" );
+      setError(true);
+    }else{
+      axios
+        .post('http://localhost:8080/registrarCliente', user)
+        .then((response) => {
+          console.log(response.data);
+          navigate('/inicio');
+        })
+        .catch((error) => {
+          setErrorMessage(!! error?.response?.data?.mensaje ?  error.response.data.mensaje : "Se ha producido un error" );
+          setError(true);
+        });
+    }
 };
 
 const onClose = ()=>{

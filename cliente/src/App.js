@@ -9,9 +9,11 @@ import Encabezado from "./components/Encabezado";
 
 import { createContext, useEffect, useState } from 'react';
 import {tema} from './tema';
-import Login from "./components/LoginForm";
+import Login from "./components/LoginForm.js";
 
 import axios from "axios"
+import EliminarEmpresas from "./pages/EliminarEmpresas";
+import ValidarEmpresas from "./pages/ValidarEmpresas";
 
 export const TemaContext = createContext(tema)
 export const LoginContext = createContext({email: "", rol:""})
@@ -48,6 +50,8 @@ function App() {
         <Route path="/registrar/empresa" index element={<RegistroEmpresaForm/>}/>
         <Route path="/inicio" index element={<Inicio/>}/>
         <Route path="/login" index element={<Login/>}/>
+        <Route path="/validarEmpresas" index element={<ValidarEmpresas/>}/>
+        <Route path="/borrarEmpresas" index element={<EliminarEmpresas/>}/>
       </Routes>  
     </Router>
     </TemaContext.Provider>

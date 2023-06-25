@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { TemaContext,LoginContext } from "../App";
-import {ReactComponent as Crucero} from '../imagenes/cruise_ship1.svg';
 
 
 export default function Inicio(){
@@ -23,20 +23,24 @@ export default function Inicio(){
     >
         
         <Box sx={{display: "flex", flexDirection:"column",justifyContent:"space-between", width:"70%"}}>
-            <Crucero alt="crucero"/>
+ 
+            {!!carga && rol==='no' &&
             <Typography variant="body1" sx={{color:tema.text, fontWeight:"bold"}}>
                 Registrate para descubrir  las mejores ofertas en cruceros
-            </Typography>
-            {!!carga && <Typography>Rol actual : {rol}</Typography>}
+            </Typography>}
 
-            <Box sx={{display: "flex", flexDirection:"row",justifyContent:"space-between", width:"70%"}}>
-            <Button variant="contained" sx={{backgroundColor:tema.primary, borderRadius:8, padding:4, marginTop:3}}>
-                <Typography variant="h2" sx={{color:tema.textSecondary, fontWeight:"bold"}}>REGISTRARSE</Typography>
-            </Button>
-            <Button variant="contained" sx={{backgroundColor:tema.primary, borderRadius:8, padding:4, marginTop:3}}>
-                <Typography variant="h2" sx={{color:tema.textSecondary, fontWeight:"bold"}}>LOGIN</Typography>
-            </Button>
-            </Box>
+            {!!carga && rol==='admin' && <>
+            <Typography variant="h3" sx={{color:tema.text, fontWeight:"bold"}}>
+                Opciones de administrador
+            </Typography>
+            <Box sx={{
+                display :"flex",
+                direction: "row",
+                width:"100%"
+            }}>
+                <Button component={Link} to='/borrarEmpresas' variant="contained" sx={{flexGrow:0.5}}>Eliminar Empresas</Button>
+                <Button component={Link} to='/validarEmpresas' variant="contained" sx={{flexGrow:0.5}}>Validar Empresas</Button>
+            </Box></>}
         </Box>
         </Box>
 }

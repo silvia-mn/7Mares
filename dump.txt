@@ -2,9 +2,6 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -189,7 +186,7 @@ admin@admin.com	$2a$10$cJBVw1Y2h9p21VLmjICM/.k5pBSVg2YLaPd7GjXmkrrx4CLLo4Vae
 --
 
 COPY public.cliente (nombre, email, password, dni, fecha, telefono) FROM stdin;
-a	a@a.com	$2b$10$5q2Z2v7451K9kM0cRDgLHuELwWqOFtxmQwLG3zO3ncSJH76V89Omm	71959423J	2023-06-23	123456789
+a	a@a.com	$2b$10$5q2Z2v7451K9kM0cRDgLHuELwWqOFtxmQwLG3zO3ncSJH76V89Omm	11111111J	2023-06-23	123456789
 \.
 
 

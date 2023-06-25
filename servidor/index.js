@@ -276,45 +276,6 @@ app.put('/cruceros/:idCrucero', async (req, res) => {
 });
 debugger;
 
-// ! BORRADOR ===============================================================================
-/*app.delete('/eventos/:idEvento', async (req, res) => {
-  const idEvento = req.params.id;
-  
-  try {
-    // Eliminar el evento por su ID
-    await Concierto.query().deleteById(idEvento);
-    
-    res.status(200).json({ status: 'OK' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar el evento' });
-  }
-});*/
-
-
-// ! BORRADOR ===============================================================================
-// !!!!! CUIDAO
-app.get('/pantallaPrincipal', async (req, res) => {
-  const idEmpresa = req.params.id;
-  try {
-    // Obtener el estado de verificación de la empresa por su ID
-    const empresa = await Empresa.query().findById(idEmpresa);
-
-    if (!empresa) {
-      return res.status(404).json({ error: 'Empresa no encontrada' });
-    }
-
-    let mensaje = ''; // Mensaje por defecto
-    if (!empresa.verificado) {
-      // Si la empresa no está verificada, asignar el mensaje de cuenta temporal
-      mensaje = 'Su cuenta es temporal y está pendiente de verificación por parte del administrador.';
-    }
-
-    res.render('pantallaPrincipal', { mensaje });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener el estado de verificación de la empresa' });
-  }
-});
-
 
 // * ========================================================================================================================================= 
 // * =====================================================================  CRUCERO ========================================================  
@@ -422,76 +383,10 @@ app.get('/crucerosDisponibles', (req, res) => {
 );
 
 
-// ! BORRADOR =======================================================================================
-/*app.get('/detallesEvento', async (req, res) => {
-  const idEvento = req.params.id; 
-
-  try {
-    // Obtener los detalles del evento por su ID
-    const concierto = await Concierto.query().findById(idEvento); 
-
-    if (!concierto) {
-      return res.status(404).json({ error: 'Evento no encontrado' });
-    }
-
-    // Comprobar si la empresa está verificada
-    const empresa = await Empresa.query().findById(concierto.empresa_email); 
-
-    let mensajeEmpresaNoVerificada = '';
-    if (empresa && !empresa.verificado) {
-      mensajeEmpresaNoVerificada = 'Esta empresa no está verificada.';
-    }
-
-    res.status(200).json({ concierto, mensajeEmpresaNoVerificada });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener los detalles del concierto' });
-  }
-});*/
-
-
-
 // * ========================================================================================================================================= 
 // * =======================================================================  COMPRA =========================================================  
 // * ========================================================================================================================================= 
 
-// ! BORRADOR =======================================================================================
-//! Función para cifrar datos
-/*const crypto = require('crypto');
-const encryptData = (data) => {
-  try {
-    const buffer = Buffer.from(data);
-    const encryptedData = crypto.publicEncrypt(
-      {
-        key: publicKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
-      },
-      buffer
-    );
-    return encryptedData.toString('base64');
-  } catch (error) {
-    throw new Error('Error al cifrar los datos');
-  }
-};*/
-
-
-//! Función para descifrar datos
-/*const decryptData = (encryptedData) => {
-  try {
-    const buffer = Buffer.from(encryptedData, 'base64');
-    const decryptedData = crypto.privateDecrypt(
-      {
-        key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
-      },
-      buffer
-    );
-    return decryptedData.toString();
-  } catch (error) {
-    throw new Error('Error al descifrar los datos');
-  }
-};*/
-
-// ! BORRADOR =======================================================================================
 //! Endpoint para comprar billetes
 app.post('/comprarBilletes', async (req, res) => {
 
@@ -565,87 +460,6 @@ app.post('/comprarBilletes', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al realizar la compra de los billetes' });
   }
 });
-
-//! ENDPOINT Mostrar informacion de compra ===============================================
-//const qr = require('qrcode');
-//const Compra = require('./models/compra.model.js');
-
-
-
-
-// ! BORRADOR =======================================================================================
-app.post('/test', async (req, res) => {
-
-// Generar un par de claves pública y privada --> Fer
-const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-  modulusLength: 2048,
-});
-
-  try {
-    //^ Obtener la información de la compra desde la base de datos
-    const comprab = await Compra.query().findById(compraId);
-
-    if (!comprab) {
-      return res.status(404).json({ mensaje: 'Compra no encontrada' });
-    }
-
-    // Obtener el nombre del crucero, la cantidad de billetes y los últimos 4 dígitos de la tarjeta
-    const crucero = await Crucero.query().findById(comprab.cruceroId);
-
-    if (!crucero) {
-      return res.status(404).json({ mensaje: 'Crucero no encontrado' });
-    }
-
-    const nombreCrucero = crucero.nombre;
-    const cantidadBilletes = comprab.cantidadBilletes;
-    const numeroTarjeta = comprab.datosTarjeta.cardNumber;
-    const ultimosDigitosTarjeta = numeroTarjeta.slice(-4);
-    const asteriscosTarjeta = '*'.repeat(numeroTarjeta.length - 4);
-
-    //^ Generar el código QR con la información de la comprab
-    /*const qrData = {
-      nombreCrucero,
-      cantidadBilletes,
-      numeroTarjeta: `${asteriscosTarjeta}${ultimosDigitosTarjeta}`,
-      compraId
-    };*/
-
-    //const qrCode = await qr.toDataURL(JSON.stringify(qrData));
-
-    // Devolver la información de la comprab y el código QR al cliente
-  res.status(200).json({ nombreCrucero, cantidadBilletes, numeroTarjeta: `${asteriscosTarjeta}${ultimosDigitosTarjeta}`/*, qrCode*/ });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ mensaje: 'Error al obtener la información de la comprab' });
-  }
-});
-
-
-
-// * ========================================================================================================================================= 
-// * =====================================================================  ADMINISTRADOR ====================================================  
-// * ========================================================================================================================================= 
-
-// TODO Endpoint: POST /REGISTRAR ADMIN --> Ok  ============================================================================================
-/*app.post('/registrarAdmin', async (req, res) => {
-  const { email, password} = req.body;
-
-  //^ Validar que se proporcionen todos los campos requeridos
-  if (!email || !password) {
-    return res.status(400).json({ mensaje: 'Faltan campos requeridos' });
-  }
-
-  //^Validar el formato del email
-  if (!esValidoEmail(email)) {
-    return res.status(400).json({ mensaje: 'Formato de email inválido' });
-  }
-
-  //^ Guardar los datos del cliente en la base de datos
-  Administrador.query().insert({
-  email,
-  unsecurePassword: password
-  }).then(results => res.status(200).json({status: "Ok"})).catch(err => res.status(500).json({error: err}));
-});*/
 
 
 // Parámetros

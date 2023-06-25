@@ -62,11 +62,9 @@ function App() {
         
         <Route path="/inicio" index element={<Inicio/>}/>
 
-        <Route path="/cruceros" index element={<TablaCruceros/>}/>
         <Route path={`/crucero/:id`} index element={<CruceroData/>}/>
         <Route path="/borrarCruceros" index element={<EliminarCruceros/>}/>
         <Route path="/modificarCruceros" index element={<ModificarCruceros/>}/>
-        <Route path="/" index element={<Pago id={2} num={1} precio={2}/>}/>
 
         <Route path="/login" index element={<Login/>}/>
         <Route path="/validarEmpresas" index element={<ValidarEmpresas/>}/>

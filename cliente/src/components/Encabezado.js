@@ -55,7 +55,7 @@ export default function Encabezado(){
         }}> 7Mares</Typography>
 
         {carga && rol==='no' &&
-            <Button sx={{marginLeft:"auto"}} href="/login" endIcon={<PersonIcon/>}>
+            <Button variant="contained" sx={{marginLeft:"auto"}} href="/login" endIcon={<PersonIcon/>}>
             Identificate
             </Button>
         }

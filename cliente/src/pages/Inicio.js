@@ -5,6 +5,7 @@ import { useContext } from "react";
 import foto from '../imagenes/crucero.jpg';
 
 import { TemaContext,LoginContext } from "../App";
+import TablaCruceros from "../components/TablaCruceros";
 
 
 export default function Inicio(){
@@ -65,6 +66,9 @@ export default function Inicio(){
             <Typography variant="h3" sx={{color:tema.text, fontWeight:"bold"}}>
                 Pendiente de verificación por parte de un administrador-
             </Typography></>}
+
+            {!!carga && rol==='cliente' && <TablaCruceros/>}
+
 
         </Box>
         </Box>

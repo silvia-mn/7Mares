@@ -14,7 +14,7 @@ const ListSubheader = styled('div')(({ theme }) => ({
   padding: theme.spacing(2),
 }));
 
-export default function TitlebarImageList() {
+export default function TablaCruceros() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {

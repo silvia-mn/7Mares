@@ -6,6 +6,8 @@ import QRCode from "react-qr-code";
 
 export default function Pago({id,precio,num}){
 
+    console.log({precio,num})
+
     const [numerotarjeta, setNumeroTarjeta] = useState('');
     const [cvv, setCVV] = useState('');
     const [fecha, setFecha] = useState('');
@@ -16,7 +18,7 @@ export default function Pago({id,precio,num}){
         event.preventDefault();
         setCargado(false);
         const data = {
-            cruceroId : id,
+            cruceroId : Number(id),
             cantidadBilletes: num,
             datosTarjeta:{
                 cardNumber : numerotarjeta,

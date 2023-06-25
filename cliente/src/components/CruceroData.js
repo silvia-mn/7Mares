@@ -8,6 +8,7 @@ import { styled } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
 import foto from '../imagenes/crucero2.jpg';
 import { TextField } from '@mui/material';
+import Pago from './Pago';
 
 
 export default function CruceroData(){
@@ -17,9 +18,12 @@ const [ticketCount, setTicketCount] = useState(1);
 const [price,setPrice]=useState(-1);
 const [error,setError] = useState(false);
 const [errorMessage,setErrorMessage] = useState("");
+const [pay,setPay] = useState(false);
 const {id}=useParams();
 
-
+const onClose = ()=>{
+  setError(false);
+}
 
 useEffect(()=>{
     if(!loaded){
@@ -41,22 +45,31 @@ const handleTicketCountChange = (event) => {
 
   const handlePay = () => {
     if(loaded){
-        if (crucero.aforo > 0){
+        if (crucero.aforo > 0 && ticketCount<crucero.aforo){
+          if (ticketCount<=0){
+            setError(true);
+            setErrorMessage('Introduzca una cantidad de tickets válida por favor.');  
+          }else{
           setPrice(crucero.price);
+          setPay(true);
+          }
         }else{
           setError(true);
           setErrorMessage('No quedan camarotes disponibles en el barco. Lo sentimos.');
         }
-        if (ticketCount<=0){
-            setError(true);
-            setErrorMessage('Introduzca una cantidad de tickets válida por favor.');  
-        }
+        
       }
     console.log(`Paying for ${ticketCount} tickets`);
   };
 
 
-return(
+return(<>
+{
+          error &&
+            <Alert severity="error" onClose={onClose}>{errorMessage}</Alert>
+        }
+{
+!pay &&
 <Container sx={{minHeight:750}}>
     {loaded ? (
         existen ? (
@@ -137,7 +150,9 @@ return(
             </Box>
             )
     ):(<CircularProgress/>)}
-</Container>
+</Container>}
+{pay && <Pago id={id} num={ticketCount} precio={crucero.precio}/>}
+</>
 )
 
 

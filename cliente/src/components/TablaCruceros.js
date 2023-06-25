@@ -1,80 +1,60 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import { FixedSizeList } from 'react-window';
-import {useState,useEffect,useContext} from 'react';
-import {CircularProgress} from '@mui/material';
-import { TemaContext } from '../App';
+import React, { useEffect, useState } from 'react';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
+import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import foto from '../imagenes/crucero2.jpg';
+import InfoIcon from '@mui/icons-material/Info';
 
-function renderRow(props) {
-  const { index, style, data} = props;
-  const item = data[index];
-  console.log(data);
 
-  return (
-    <ListItem style={style} key={index} component="div" disablePadding>
-      <ListItemButton>
-        <ListItemText />
-        {item.nombre}
-      </ListItemButton>
-    </ListItem>
-  );
-}
+const ListSubheader = styled('div')(({ theme }) => ({
+  fontSize: '1.2rem',
+  fontWeight: 'bold',
+  padding: theme.spacing(2),
+}));
 
-export default function VirtualizedList() {
-  const tema = useContext(TemaContext);
-  const [loaded,setLoaded] = useState(false);
-  const [hasItems,setHasItems] = useState(false);
-  const [rows, setRows] = useState([]);
+export default function TitlebarImageList() {
+  const [items, setItems] = useState([]);
 
-  useEffect(()=>{
-    axios.get('http://localhost:8080/crucerosDisponibles',{withCredentials:true})
-    .then((response)=>{
-        setLoaded(true);
-        if (response.data.length===0){
-            setHasItems(false);
-            setLoaded(true);
-            
-        }else{
-            setHasItems(true);
-            setRows(response.data.map(item => ({
-                    nombre: item.nombre,
-                    puerto: item.puerto,
-                    ubicacion: item.ubicacion,
-                    fecha: item.fecha,
-                    hora: item.hora,
-                    precio: item.precio
-                }))
-                );
-            setLoaded(true);
-        }
-    })
-    .catch((err)=>{
-        setLoaded(true);
-        setHasItems(false);
-    })
-},[])
+  useEffect(() => {
+    axios
+      .get('http://localhost:8080/crucerosDisponibles', { withCredentials: true })
+      .then((response) => {
+        const data = response.data.map((item) => ({
+          img: foto,
+          title: item.nombre,
+          author: item.puerto,
+          route: `/crucero/${item.id}`, 
+        }));
+        setItems(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   return (
-    <Box
-      sx={{ width: '100%', height: 400, maxWidth: 360, bgcolor: 'background.paper' }}
-    >
-    {(!!loaded)?  
-      <FixedSizeList
-        height={400}
-        width={360}
-        itemSize={46}
-        itemCount={rows.length}
-        itemData={rows}
-      >
-        {renderRow}
-      </FixedSizeList>
-      :
-      <CircularProgress sx={{color:tema.primary}}/>
-    }
-    </Box>
+    <ImageList sx={{ width: 500, height: 450 }}>
+      <ImageListItem key="Subheader" cols={2}>
+        <ListSubheader component="div">Cruceros Disponibles</ListSubheader>
+      </ImageListItem>
+      {items.map((item) => (
+        <ImageListItem key={item.img}>
+          <a href={item.route}>
+            <img
+              src={item.img}
+              alt={item.title}
+              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+            />
+          </a>
+          <ImageListItemBar
+            title={item.title}
+            subtitle={item.author}
+            actionIcon={<InfoIcon />}
+          />
+        </ImageListItem>
+      ))}
+    </ImageList>
   );
 }

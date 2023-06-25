@@ -649,20 +649,16 @@ const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
 });*/
 
 
-// Parámetros? 
-  app.get('/eventos/:id', async (req, res) => {
-    const eventoId = req.params.id;
-  
+// Parámetros
+  app.get('/crucero/:id', async (req, res) => {
+    const cruceroId = req.params.id; 
     try {
-        // Recuperar los detalles del evento de la base de datos     
-        const evento = await Evento.query().findById(eventoId);
-  
-      //! verificar que el evento ha sido creado por una empresa verificada
-  
-      res.status(200).json(evento);
+        // Recuperar los detalles del crucero de la base de datos     
+        const crucero = await Crucero.query().findById(cruceroId);
+      res.status(200).json(crucero);
     } catch (error) {
-      console.error('Error al obtener los detalles del evento:', error);
-      res.status(500).json({ mensaje: 'Error al obtener los detalles del evento' });
+      console.error('Error al obtener los detalles del crucero:', error);
+      res.status(500).json({ mensaje: 'Error al obtener los detalles del crucero' });
     }
   });
   

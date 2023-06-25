@@ -18,6 +18,8 @@ export default function RegistrationFormU(props) {
   const minDate = hoy.toISOString().split("T")[0]; 
   const [errorMessage, setErrorMessage] = React.useState('');
   const [error, setError] = React.useState(false);
+  const [successMessage, setSuccessMessage] = React.useState('');
+  const [success, setSuccess] = React.useState(false);
 
   const navigate = useNavigate();
 
@@ -38,6 +40,10 @@ export default function RegistrationFormU(props) {
       ({url:'http://localhost:8080/registrarCrucero',method:'POST',withCredentials:true, data:data})
       .then((response) => {
         console.log(response.data);
+
+        setSuccess(true);
+        setSuccessMessage('Correctly added!');
+
       })
       .catch((error) => {
         if(error?.response?.data?.mensaje)
@@ -49,7 +55,11 @@ export default function RegistrationFormU(props) {
 };
 
 const onClose = ()=>{
-  setError(false);
+    setError(false);
+  }
+  
+const onCloseSuccess = () =>{
+    setSuccess(false);
 }
 
   return (
@@ -57,6 +67,10 @@ const onClose = ()=>{
        {
           error &&
             <Alert severity="error" onClose={onClose}>{errorMessage}</Alert>
+        }
+        {
+          success &&
+            <Alert severity="success" onClose={onCloseSuccess}>{successMessage}</Alert>
         }
     <Box sx={{ width: '400px', p: 2 }}>
       <form onSubmit={handleSubmit}>

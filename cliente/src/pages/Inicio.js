@@ -24,8 +24,10 @@ export default function Inicio(){
         padding: 0
         }}
     >
-        <Box sx={{display: "flex", flexDirection:"column",justifyContent:"space-between", width:"70%"}}>
- 
+        <Box sx={{display: "flex", flexDirection:"column",justifyContent:"space-between", width:"60%",marginTop: 3, alignItems: "center",
+        textAlign:"center"}}>
+            <img src={foto} alt="crucero" style={{width:'100%', height: '400px'}}/>
+
             {!!carga && rol==='no' &&
             <Typography variant="body1" sx={{color:tema.text, fontWeight:"bold"}}>
                 Registrate para descubrir  las mejores ofertas en cruceros
@@ -44,13 +46,6 @@ export default function Inicio(){
                 <Button component={Link} to='/validarEmpresas' variant="contained" sx={{flexGrow:0.5}}>Validar Empresas</Button>
             </Box></>}
 
-
-        <Box sx={{display: "flex", flexDirection:"column",justifyContent:"space-between", width:"60%", marginTop: 3, alignItems: "center",
-        textAlign:"center"}}>
-        <img src={foto} alt="crucero" style={{width:'100%', height: '400px'}}/>
-        <Typography variant="body1" sx={{color:tema.text, fontWeight:"bold"}}>
-            Registrate para descubrir las mejores ofertas en cruceros
-        </Typography>
         </Box>
         </Box>
 }

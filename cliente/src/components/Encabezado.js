@@ -1,16 +1,17 @@
 import {AppBar,Typography} from "@mui/material"
 import {Menu,MenuItem, MenuList} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import Button from "@mui/material/Button";
 import HomeIcon from '@mui/icons-material/Home';
 import { useState,useContext } from "react";
-import { TemaContext } from "../App";
+import { TemaContext,LoginContext } from "../App";
 
-import { Link } from "react-router-dom";
 import PersonIcon from '@mui/icons-material/Person';
 
 export default function Encabezado(){
 
     const tema = useContext(TemaContext);
+    const {carga,rol} = useContext(LoginContext)
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -51,8 +52,11 @@ export default function Encabezado(){
             fontWeight:"bold",
             fontFamily: 'Retro Delight'
         }}> 7Mares</Typography>
-        <IconButton sx={{marginLeft:"auto"}}>
-        Identificate <PersonIcon/>  
-      </IconButton>
+
+        {carga && rol==='no' &&
+            <Button sx={{marginLeft:"auto"}} href="/login" endIcon={<PersonIcon/>}>
+            Identificate
+            </Button>
+        }
     </AppBar>
 }

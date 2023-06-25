@@ -5,6 +5,7 @@ import RegistroClienteForm from './components/RegistroClienteForm';
 import RegistroEmpresaForm from './components/RegistroEmpresaForm';
 import TablaCruceros from './components/TablaCruceros.js';
 import RegistroCruceroForm from "./components/RegistroCruceroForm";
+import CruceroData from "./components/CruceroData";
 
 import Inicio from "./pages/Inicio"
 import Encabezado from "./components/Encabezado";
@@ -52,6 +53,7 @@ function App() {
         <Route path="/inicio" index element={<Inicio/>}/>
 
         <Route path="/cruceros" index element={<TablaCruceros/>}/>
+        <Route path={`/crucero/:id`} index element={<CruceroData/>}/>
 
 
         <Route path="/login" index element={<Login/>}/>

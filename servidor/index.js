@@ -301,7 +301,7 @@ app.post('/registrarCrucero', async (req, res) => {
     fecha,
     hora,
     empresa_email
-  }).then(results => res.status(200).json({status: "Ok"})).catch(err => res.status(500).json({error: err}));
+  }).then(results => res.status(200).json({status: "Ok"})).catch(err => {console.log(err); res.status(500).json({error: err})});
 });
 
 

@@ -4,7 +4,9 @@ import IconButton from '@mui/material/IconButton';
 import HomeIcon from '@mui/icons-material/Home';
 import { useState,useContext } from "react";
 import { TemaContext } from "../App";
+
 import { Link } from "react-router-dom";
+import PersonIcon from '@mui/icons-material/Person';
 
 export default function Encabezado(){
 
@@ -46,7 +48,11 @@ export default function Encabezado(){
         <Typography variant = "h2"
         sx = {{
             color: tema.secondary,
-            fontWeight:"bold"
+            fontWeight:"bold",
+            fontFamily: 'Retro Delight'
         }}> 7Mares</Typography>
+        <IconButton sx={{marginLeft:"auto"}}>
+        Identificate <PersonIcon/>  
+      </IconButton>
     </AppBar>
 }

@@ -2,7 +2,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 
-import foto from '../imagenes/crucero.jpg';
+import foto from '../imagenes/crucero3.jpg';
 
 import { TemaContext,LoginContext } from "../App";
 import TablaCruceros from "../components/TablaCruceros";

@@ -1,9 +1,11 @@
 import {AppBar,Typography} from "@mui/material"
 import {Menu,MenuItem, MenuList} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
 import { useState,useContext } from "react";
 import { TemaContext } from "../App";
+
+import { Link } from "react-router-dom";
 import PersonIcon from '@mui/icons-material/Person';
 
 export default function Encabezado(){
@@ -37,27 +39,12 @@ export default function Encabezado(){
         <IconButton
             size="large"
             edge="start"
-            aria-label="menu"
+            aria-label="home"
             sx={{ mr: 2 }}
-            onClick={handleClick}
+            href="/inicio"
           >
-            <MenuIcon />
+            <HomeIcon />
           </IconButton>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-            'aria-labelledby': 'basic-button',
-            }}
-            >
-        <MenuList>
-            <MenuItem onClick={handleClose}><Typography variant="h5">Login</Typography></MenuItem>
-            <MenuItem onClick={handleClose}><Typography variant="h5">Test</Typography></MenuItem>
-        </MenuList>
-      </Menu>
-      
         <Typography variant = "h2"
         sx = {{
             color: tema.secondary,

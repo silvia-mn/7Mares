@@ -160,8 +160,32 @@ app.post('/registrarEmpresa', (req, res) => {
 
 app.get('/empresas',(req,res)=>{
   if(!!req.user){
-    if(!!req.user.rol === "admin"){
+    if(req.user.rol === "admin"){
         Empresa.query().then(resultado => res.json(resultado)).catch(err=> res.status(500).json({error:err}));
+    }else{
+      res.status(401).json({error:'No autorizado'});
+    }
+  }else{
+    res.status(401).json({error:'No autenticado'});
+  }
+});
+
+app.get('/empresasSinValidar',(req,res)=>{
+  if(!!req.user){
+    if(req.user.rol === "admin"){
+        Empresa.query().where({verificado:false}).then(resultado => res.json(resultado)).catch(err=> res.status(500).json({error:err}));
+    }else{
+      res.status(401).json({error:'No autorizado'});
+    }
+  }else{
+    res.status(401).json({error:'No autenticado'});
+  }
+});
+
+app.post('/validarEmpresa',(req,res)=>{
+  if(!!req.user){
+    if(req.user.rol === "admin"){
+        Empresa.query().patch({verificado : true}).findById(req.body.id).then(resultado => res.json(resultado)).catch(err=> res.status(500).json({error:err}));
     }else{
       res.status(401).json({error:'No autorizado'});
     }
@@ -172,7 +196,7 @@ app.get('/empresas',(req,res)=>{
 
 
 // TODO Endpoint: POST /BORRAR EMPRESA --> Ok ========================================================================================
-app.post('/borrarEmpresa', async (req, res) => {
+app.post('/borrarEmpresa', (req, res) => {
   const empresaId = req.body.id;
   Empresa.query().deleteById(empresaId).then(results => res.status(200).json({status: "OK"})).catch(err => res.status(500).json({error: err}));
   });

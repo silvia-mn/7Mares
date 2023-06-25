@@ -3,7 +3,7 @@
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import RegistroClienteForm from './components/RegistroClienteForm';
 import RegistroEmpresaForm from './components/RegistroEmpresaForm';
-import TablaCruceros from './components/TablaCruceros';
+import TablaCruceros from './components/TablaCruceros.js';
 import RegistroCruceroForm from "./components/RegistroCruceroForm";
 
 import Inicio from "./pages/Inicio"

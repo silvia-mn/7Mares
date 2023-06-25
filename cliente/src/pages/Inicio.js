@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography,Paper } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 
@@ -25,8 +25,8 @@ export default function Inicio(){
         padding: 0
         }}
     >
-        <Box sx={{display: "flex", flexDirection:"column",justifyContent:"space-between", width:"60%",marginTop: 3, alignItems: "center",
-        textAlign:"center"}}>
+        <Box sx={{display: "flex", flexDirection:"column", width:"75%",marginTop: 0, alignItems: "center",
+        textAlign:"center",backgroundColor:"#f1dad4",padding:3, minHeight:"100vh",borderColor:"black"}}>
             <img src={foto} alt="crucero" style={{width:'100%', height: '400px'}}/>
 
             {!!carga && rol==='no' &&

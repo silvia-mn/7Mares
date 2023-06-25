@@ -16,6 +16,9 @@ import Login from "./components/LoginForm.js";
 import axios from "axios"
 import EliminarEmpresas from "./pages/EliminarEmpresas";
 import ValidarEmpresas from "./pages/ValidarEmpresas";
+import EliminarCruceros from "./pages/EliminarCruceros";
+import ModificarCruceroForm from "./components/ModificarCrucero";
+import ModificarCruceros from "./pages/ModificarCruceros";
 
 export const TemaContext = createContext(tema)
 export const LoginContext = createContext({email: "", rol:""})
@@ -23,6 +26,7 @@ export const LoginContext = createContext({email: "", rol:""})
 
 function App() {
   const [rol,setRole] = useState("no");
+  const [verificado,setVerificado] = useState(false);
   const  [carga,setCarga] = useState(false);
 
   useEffect(()=>{
@@ -34,6 +38,7 @@ function App() {
         {
           setCarga(true);
           setRole(r.data.rol);
+          if (r.data.rol==="empresa") setVerificado(true);
         }).catch(err=>{
           setCarga(true);
           setRole('no');
@@ -42,7 +47,7 @@ function App() {
   },[carga,rol])
 
   return (
-    <LoginContext.Provider value={{rol,carga,setCarga}}>
+    <LoginContext.Provider value={{rol,carga,setCarga,verificado}}>
     <TemaContext.Provider value={tema}>
     <Encabezado/>
     <Router>
@@ -51,9 +56,13 @@ function App() {
         <Route path="/registrar/usuario" index element={<RegistroClienteForm/>}/>
         <Route path="/registrar/empresa" index element={<RegistroEmpresaForm/>}/>
         <Route path="/registrar/crucero" index element={<RegistroCruceroForm/>}/>
+        <Route path="/modificarCrucero/:id" index element={<ModificarCruceroForm/>}/>
+        
         <Route path="/inicio" index element={<Inicio/>}/>
 
         <Route path="/cruceros" index element={<TablaCruceros/>}/>
+        <Route path="/borrarCruceros" index element={<EliminarCruceros/>}/>
+        <Route path="/modificarCruceros" index element={<ModificarCruceros/>}/>
 
 
         <Route path="/login" index element={<Login/>}/>

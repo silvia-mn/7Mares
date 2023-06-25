@@ -16,7 +16,7 @@ export default class Compra extends Model {
       id: {
         type: "integer",
       },
-      cruceroId: {
+      cruceroid: {
         type: "integer",
       },
       cantidadbilletes: {

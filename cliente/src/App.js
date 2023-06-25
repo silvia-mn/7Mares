@@ -19,6 +19,7 @@ import ValidarEmpresas from "./pages/ValidarEmpresas";
 import EliminarCruceros from "./pages/EliminarCruceros";
 import ModificarCruceroForm from "./components/ModificarCrucero";
 import ModificarCruceros from "./pages/ModificarCruceros";
+import Pago from "./components/Pago";
 
 export const TemaContext = createContext(tema)
 export const LoginContext = createContext({email: "", rol:""})
@@ -63,6 +64,7 @@ function App() {
         <Route path="/cruceros" index element={<TablaCruceros/>}/>
         <Route path="/borrarCruceros" index element={<EliminarCruceros/>}/>
         <Route path="/modificarCruceros" index element={<ModificarCruceros/>}/>
+        <Route path="/" index element={<Pago id={2} num={1} precio={2}/>}/>
 
 
         <Route path="/login" index element={<Login/>}/>

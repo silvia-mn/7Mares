@@ -13,6 +13,10 @@ import { development } from './knexfile.js';
 import passport from 'passport';
 import session from 'express-session';
 import strategyInitGeneral from './lib/AuthStrategyGeneral.js';
+
+
+import CryptoES from 'crypto-es';
+import axios from "axios";
 // Instanciamos Express y el middleware de JSON y CORS -
 const app = express();
 app.use(express.json());
@@ -490,7 +494,11 @@ const encryptData = (data) => {
 // ! BORRADOR =======================================================================================
 //! Endpoint para comprar billetes
 app.post('/comprarBilletes', async (req, res) => {
-  const { cruceroId, cantidadBilletes, datosTarjeta } = req.body;
+
+  const datastr = CryptoES.AES.decrypt(req.body.encriptado,"secreto").toString(CryptoES.enc.Utf8);
+  const data = JSON.parse(datastr);
+
+  const { cruceroId, cantidadBilletes, datosTarjeta } = data;
 
   // Validar que se proporcionen todos los campos requeridos
   if (!cruceroId || !cantidadBilletes || !datosTarjeta) {
@@ -521,42 +529,40 @@ app.post('/comprarBilletes', async (req, res) => {
       return res.status(400).json({ mensaje: 'No hay suficientes billetes disponibles' });
     }
 
-    // Realizar el proceso de compra de billetes
-    crucero.aforo -= cantidadBilletes;
-    await crucero.$query().patch();
+    const precio = crucero.precio * cantidadBilletes;
 
-    // Crear la estructura de datos deseada
-    const misDatos = {
-      cruceroId: parseInt(cruceroId),
-      cantidadBilletes: parseInt(cantidadBilletes),
-      datosTarjeta: {
-        cardNumber: datosTarjeta.cardNumber,
-        cvv: datosTarjeta.cvv,
-        expiresOn: datosTarjeta.expiresOn
-      }
-    };
+    const response = await axios.post('https://pse-payments-api.ecodium.dev/payment', {
+      clientId: "0",
+      paymentDetails:{
+          creditCard:datosTarjeta,
+          totalAmount: precio.toString()
+          }
+    });
 
-    // Convertir a JSON y luego a base64
-    const miString = JSON.stringify(misDatos);
-    const secure = Buffer.from(miString).toString('base64');
+    if(!!response.data.success){
+      // Guardar la información de la compra en la base de datos
+      const compra = {
+        cruceroid:cruceroId,
+        cantidadbilletes:cantidadBilletes,
+        cardnumber:datosTarjeta.cardNumber,
+        cvv:datosTarjeta.cvv,
+        expireson:datosTarjeta.expiresOn,
+      };
 
-    //const secureReverse = JSON.parse(Buffer.from(secure, 'base64'));
-    console.log(secure);
-
-    // Guardar la información de la compra en la base de datos
-    const compra = {
-      cruceroId,
-      cantidadBilletes,
-      datosTarjeta: datosTarjetaCifrados,
-    };
-
-    await Compra.query().insert(compra);
-
-    // Enviar una respuesta exitosa al cliente
-    res.status(200).json({ mensaje: 'Billetes comprados exitosamente' });
+      await Compra.query().insert(compra);
+      crucero.aforo -= cantidadBilletes;
+      await crucero.$query().patch({aforo:crucero.aforo});
+      
+      // Enviar una respuesta exitosa al cliente
+      res.status(200).json(response.data);
+    }
+  else{
+      done({status:400, error: response.data.errors})
+  }
   } catch (error) {
     // Manejar cualquier error que ocurra durante el proceso de compra
     console.log(error);
+    console.log(error?.response?.data?.errors);
     res.status(500).json({ mensaje: 'Error al realizar la compra de los billetes' });
   }
 });

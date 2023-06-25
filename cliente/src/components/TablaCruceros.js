@@ -50,7 +50,7 @@ export default function TablaCruceros() {
   return (<>
     {loaded ? (
       existen?(
-    <ImageList sx={{ width: 500, height: 450 }}>
+    <ImageList sx={{ width: "100%", height: 450 }}>
       <ImageListItem key="Subheader" cols={2}>
         <ListSubheader component="div">Cruceros Disponibles</ListSubheader>
       </ImageListItem>

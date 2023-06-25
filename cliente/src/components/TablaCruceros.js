@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
@@ -6,6 +8,7 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import foto from '../imagenes/crucero2.jpg';
 import InfoIcon from '@mui/icons-material/Info';
+import { CircularProgress } from '@mui/material';
 
 
 const ListSubheader = styled('div')(({ theme }) => ({
@@ -16,11 +19,16 @@ const ListSubheader = styled('div')(({ theme }) => ({
 
 export default function TablaCruceros() {
   const [items, setItems] = useState([]);
+  const [loaded, setLoaded] = useState(false)
+  const [existen, setExisten] = useState(false)
 
   useEffect(() => {
+    if(!loaded){
     axios
       .get('http://localhost:8080/crucerosDisponibles', { withCredentials: true })
       .then((response) => {
+        console.log(response);
+        setExisten(true);
         const data = response.data.map((item) => ({
           img: foto,
           title: item.nombre,
@@ -28,13 +36,20 @@ export default function TablaCruceros() {
           route: `/crucero/${item.id}`, 
         }));
         setItems(data);
+        setLoaded(true);
       })
       .catch((error) => {
         console.error(error);
+        setLoaded(true);
       });
-  }, []);
+    }
+  }, [loaded]);
 
-  return (
+  
+
+  return (<>
+    {loaded ? (
+      existen?(
     <ImageList sx={{ width: 500, height: 450 }}>
       <ImageListItem key="Subheader" cols={2}>
         <ListSubheader component="div">Cruceros Disponibles</ListSubheader>
@@ -56,5 +71,15 @@ export default function TablaCruceros() {
         </ImageListItem>
       ))}
     </ImageList>
-  );
+      ):(
+        <Box>
+                <Typography variant="h3"> No hay cruceros cargados en la aplicación </Typography>
+            </Box>
+       )
+
+    ):
+      <CircularProgress/>}
+  </>);
+      
 }
+

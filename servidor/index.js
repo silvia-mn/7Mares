@@ -562,7 +562,6 @@ app.post('/comprarBilletes', async (req, res) => {
   } catch (error) {
     // Manejar cualquier error que ocurra durante el proceso de compra
     console.log(error);
-    console.log(error?.response?.data?.errors);
     res.status(500).json({ mensaje: 'Error al realizar la compra de los billetes' });
   }
 });

@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import TablaEmpresas from "../components/TablaEmpresas";
+import TablaSimpleCruceros from "../components/TablaSimpleCruceros";
 
-export default function EliminarEmpresas(){
+import { useNavigate } from "react-router-dom";
+
+export default function ModificarCruceros(){
     const [data,setData] = useState([]);
     const [cargado,setCargado] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(()=>{
         if(!cargado){
             axios({
-                url:"http://localhost:8080/empresas",
+                url:"http://localhost:8080/crucerosPorEmpresa",
                 method: "GET",
                 withCredentials:true
             }).then(r=> {
@@ -22,7 +26,9 @@ export default function EliminarEmpresas(){
     },[cargado]);
 
     return <>
-        {!!cargado && <TablaEmpresas data={data} setData={setData} url="http://localhost:8080/borrarEmpresa"/>}
+        {!!cargado && <TablaSimpleCruceros data={data} fun={(id)=>{
+            navigate('/modificarCrucero/'+id)
+        }} text='¿Modificar?'/>}
     </>
 
 }

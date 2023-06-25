@@ -11,7 +11,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-export default function TablaEmpresas({data,setData,url,text='¿Eliminar?'}){
+export default function TablaSimpleCruceros({data,fun,text='¿Eliminar?'}){
 
     const tema = useContext(TemaContext);
 
@@ -21,7 +21,8 @@ export default function TablaEmpresas({data,setData,url,text='¿Eliminar?'}){
           <TableRow>
           <TableCell>Nombre</TableCell>
             <TableCell>Puerto</TableCell>
-            <TableCell>Email</TableCell>
+            <TableCell>Precio</TableCell>
+            <TableCell>Descripcion</TableCell>
             <TableCell>{text}</TableCell>
           </TableRow>
         </TableHead>
@@ -34,17 +35,10 @@ export default function TablaEmpresas({data,setData,url,text='¿Eliminar?'}){
                 {row.nombre}
               </TableCell>
             <TableCell>{row.puerto}</TableCell>
-            <TableCell>{row.email}</TableCell>
-            <TableCell><Button onClick={() => {
-                axios({
-                    url:url,
-                    method:"POST",
-                    withCredentials:true,
-                    data : {
-                        id : row.email
-                    }
-                }).then(()=> setData(data.filter(it=>it.email!==row.email))).
-                catch(err=>console.log(err))}
+            <TableCell>{row.precio}</TableCell>
+            <TableCell>{row.descripcion}</TableCell>
+            <TableCell><Button onClick={() => { fun(row.id)
+               }
             }>X</Button></TableCell>
             </TableRow>)}
         </TableBody>

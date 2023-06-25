@@ -1,14 +1,18 @@
-import {AppBar,Typography} from "@mui/material"
-import {Menu,MenuItem, MenuList} from '@mui/material';
+import {AppBar,Typography,Box} from "@mui/material"
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
+import Button from "@mui/material/Button";
+import HomeIcon from '@mui/icons-material/Home';
 import { useState,useContext } from "react";
-import { TemaContext } from "../App";
+import { TemaContext,LoginContext } from "../App";
+
+import axios from "axios";
+
 import PersonIcon from '@mui/icons-material/Person';
 
 export default function Encabezado(){
 
     const tema = useContext(TemaContext);
+    const {carga,rol,setCarga} = useContext(LoginContext)
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -37,35 +41,59 @@ export default function Encabezado(){
         <IconButton
             size="large"
             edge="start"
-            aria-label="menu"
+            aria-label="home"
             sx={{ mr: 2 }}
-            onClick={handleClick}
+            href="/inicio"
           >
-            <MenuIcon />
+            <HomeIcon />
           </IconButton>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-            'aria-labelledby': 'basic-button',
-            }}
-            >
-        <MenuList>
-            <MenuItem onClick={handleClose}><Typography variant="h5">Login</Typography></MenuItem>
-            <MenuItem onClick={handleClose}><Typography variant="h5">Test</Typography></MenuItem>
-        </MenuList>
-      </Menu>
-      
         <Typography variant = "h2"
         sx = {{
             color: tema.secondary,
             fontWeight:"bold",
             fontFamily: 'Retro Delight'
         }}> 7Mares</Typography>
-        <IconButton sx={{marginLeft:"auto"}}>
-        Identificate <PersonIcon/>  
-      </IconButton>
+
+        {carga && rol==='no' &&
+            <Button sx={{marginLeft:"auto"}} href="/login" endIcon={<PersonIcon/>}>
+            Identificate
+            </Button>
+        }
+
+        {carga && (rol!=='no') &&
+            <Box sx={{marginLeft:"auto", display:"flex", flexDirection:"row", width:"fit-content"}}>
+                <Button variant="contained" onClick={()=>{
+                    axios({
+                        url:'http://localhost:8080/logout',
+                        method: 'GET',
+                        withCredentials: true,
+                    }).then(()=>{
+                        setCarga(false);
+                    }).catch(err=>console.log(err));
+                }} endIcon={<PersonIcon/>}>
+                Cerrar sesión
+                </Button>
+                { (rol==='empresa' || rol==='cliente') &&
+                <Button variant="contained" onClick={()=>{
+                    const url = (rol==='cliente') ? 'http://localhost:8080/borrarCliente' :  'http://localhost:8080/borrarEmpresa';
+                    axios({
+                        url:url,
+                        method: 'POST',
+                        withCredentials: true,
+                    }).then(()=>{
+                        axios({
+                            url:'http://localhost:8080/logout',
+                            method: 'GET',
+                            withCredentials: true,
+                        }).then(()=>setCarga(false)).catch((err)=>{
+                            console.log(err);
+                        });
+                    }).catch(err=>console.log(err));
+                }} endIcon={<PersonIcon/>}>
+                Borrar Cuenta
+                </Button>
+                }
+            </Box>
+        }
     </AppBar>
 }

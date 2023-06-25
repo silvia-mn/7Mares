@@ -13,6 +13,10 @@ import { development } from './knexfile.js';
 import passport from 'passport';
 import session from 'express-session';
 import strategyInitGeneral from './lib/AuthStrategyGeneral.js';
+
+
+import CryptoES from 'crypto-es';
+import axios from "axios";
 // Instanciamos Express y el middleware de JSON y CORS -
 const app = express();
 app.use(express.json());
@@ -64,13 +68,22 @@ app.get('/user', (req, res) => {
   else res.status(500).json({status: "error"})
 });
 
+app.get('/logout',(req,res)=>{
+  req.logout(err => {
+    if (!!err){
+      res.status(500).json({error:err});
+    }else{
+      res.status(200).json({status:'OK'});
+    }
+  });
+});
+
 // * ========================================================================================================================================= 
 // * =======================================================================  CLIENTE ======================================================== 
 // * ========================================================================================================================================= 
 
 // TODO Endpoint: POST /REGISTRAR CLIENTE --> Ok  ============================================================================================
 app.post('/registrarCliente', (req, res) => {
-    console.log(req.body)
     const { nombre, email, password, dni, fecha, telefono } = req.body;
   
     //^ Validar que se proporcionen todos los campos requeridos
@@ -110,10 +123,18 @@ app.post('/registrarCliente', (req, res) => {
   
 
 // TODO Endpoint: POST /BORRAR CLIENTE --> Ok ========================================================================================
-app.post('/borrarCliente', async (req, res) => {
-    const clienteId = req.body.id;
-    Cliente.query().deleteById(clienteId).then(results => res.status(200).json({status: "OK"})).catch(err => res.status(500).json({error: err}));
-});
+app.post('/borrarCliente', (req, res) => {
+    if(!!req.user){
+      if(req.user.rol === "cliente"){
+      const clienteId = req.user.email;
+      Cliente.query().deleteById(clienteId).then(results => res.status(200).json({status: "OK"})).catch(err => res.status(500).json({error: err}));
+    }else{
+      res.status(401).json({error:'No autorizado'});
+    }
+    }else{
+    res.status(401).json({error:'No autenticado'});
+    }
+  });
 
 
 // * ========================================================================================================================================= 
@@ -160,8 +181,32 @@ app.post('/registrarEmpresa', (req, res) => {
 
 app.get('/empresas',(req,res)=>{
   if(!!req.user){
-    if(!!req.user.rol === "admin"){
+    if(req.user.rol === "admin"){
         Empresa.query().then(resultado => res.json(resultado)).catch(err=> res.status(500).json({error:err}));
+    }else{
+      res.status(401).json({error:'No autorizado'});
+    }
+  }else{
+    res.status(401).json({error:'No autenticado'});
+  }
+});
+
+app.get('/empresasSinValidar',(req,res)=>{
+  if(!!req.user){
+    if(req.user.rol === "admin"){
+        Empresa.query().where({verificado:false}).then(resultado => res.json(resultado)).catch(err=> res.status(500).json({error:err}));
+    }else{
+      res.status(401).json({error:'No autorizado'});
+    }
+  }else{
+    res.status(401).json({error:'No autenticado'});
+  }
+});
+
+app.post('/validarEmpresa',(req,res)=>{
+  if(!!req.user){
+    if(req.user.rol === "admin"){
+        Empresa.query().patch({verificado : true}).findById(req.body.id).then(resultado => res.json(resultado)).catch(err=> res.status(500).json({error:err}));
     }else{
       res.status(401).json({error:'No autorizado'});
     }
@@ -172,26 +217,44 @@ app.get('/empresas',(req,res)=>{
 
 
 // TODO Endpoint: POST /BORRAR EMPRESA --> Ok ========================================================================================
-app.post('/borrarEmpresa', async (req, res) => {
-  const empresaId = req.body.id;
-  Empresa.query().deleteById(empresaId).then(results => res.status(200).json({status: "OK"})).catch(err => res.status(500).json({error: err}));
+app.post('/borrarEmpresa', (req, res) => {
+  if(!!req.user){
+    if(req.user.rol === "admin"){
+    const empresaId = req.body.id;
+    Empresa.query().deleteById(empresaId).then(results => res.status(200).json({status: "OK"})).catch(err => res.status(500).json({error: err}));
+    }else{
+      if(req.user.rol === 'empresa'){
+        const empresaId = req.user.email;
+        Empresa.query().deleteById(empresaId).then(results => {
+        res.status(200).json({status: "OK"});}).catch(err => res.status(500).json({error: err}));
+        }else{
+        res.status(401).json({error:'No autorizado'});
+        }
+  }
+  }else{
+  res.status(401).json({error:'No autenticado'});
+  }
   });
 
 
 // TODO Endpoint: GET /LISTADO CRUCEROS POR EMPRESA --> Ok ===============================================================================
-app.get('/crucerosPorEmpresa', async (req, res) => {
+app.get('/crucerosPorEmpresa',  (req, res) => {
+  if(!!req.user){
+    if(req.user.rol === "empresa" && req.user.verificado){
+      // Obtener los eventos disponibles (que no hayan pasado)
+      const hoy = new Date();
+      hoy.setDate(hoy.getDate()+2);
+      const limite = hoy;
 
-const emailEmpresa = req.query.id;
-
-try {
-  // Obtener los cruceros que coinciden con el email de la empresa
-  const cruceros = await Crucero.query()
-    .where('empresa_email', emailEmpresa)
-
-  res.status(200).json(cruceros);
-} catch (error) {
-  res.status(500).json({ error: 'Error al obtener los cruceros por empresa' });
-}
+      Crucero.query().where('fecha','>',limite).where('empresa_email',req.user.email).then(r=>res.status(200).json(r)).catch((error)=>
+      res.status(500).json({ error: error }))
+  }else{
+    res.status(401).json({error:'No autorizado'});
+  }
+  }else{
+  res.status(401).json({error:'No autenticado'});
+  }
+    
 });
 
 // ! BORRADOR Endpoint: PUT ==================================================================================================================
@@ -258,47 +321,105 @@ app.get('/pantallaPrincipal', async (req, res) => {
 // * ========================================================================================================================================= 
 
 // TODO Endpoint: POST /REGISTRAR CRUCERO --> Ok  ============================================================================================
-app.post('/registrarCrucero', async (req, res) => {
-  const { nombre, puerto, ubicacion, aforo, descripcion, fecha, hora, precio, empresa_email } = req.body;
+app.post('/registrarCrucero', (req, res) => {
+  if(!!req.user){
+    if(req.user.rol === "empresa" && req.user.verificado){
+      const { nombre, puerto, ubicacion, aforo, descripcion, fecha, hora, precio } = req.body;
 
-  //^ Validar que se proporcionen todos los campos requeridos 
-  if (!nombre || !puerto || !ubicacion || !aforo || !descripcion || !fecha || !hora || !precio || !empresa_email ) {
-    return res.status(400).json({ mensaje: 'Faltan campos requeridos' });
+      const empresa_email = req.user.email;
+
+      //^ Validar que se proporcionen todos los campos requeridos 
+      if (!nombre || !puerto || !ubicacion || !aforo || !descripcion || !fecha || !hora || !precio || !empresa_email ) {
+        return res.status(400).json({ mensaje: 'Faltan campos requeridos' });
+      }
+
+      //^ Guardar los datos del crucero en la base de datos 
+      Crucero.query().insert({
+        nombre,
+        puerto,
+        ubicacion,
+        aforo: Number(aforo),
+        precio: Number(precio),
+        descripcion,
+        fecha,
+        hora,
+        empresa_email
+      }).then(results => res.status(200).json({status: "Ok"})).catch(err => {console.log(err); res.status(500).json({error: err})});
+  }else{
+    res.status(401).json({error:'No autorizado'});
   }
+  }else{
+  res.status(401).json({error:'No autenticado'});
+  }
+});
 
-  //^ Guardar los datos del crucero en la base de datos 
-  Crucero.query().insert({
-    nombre,
-    puerto,
-    ubicacion,
-    aforo: Number(aforo),
-    precio: Number(precio),
-    descripcion,
-    fecha,
-    hora,
-    empresa_email
-  }).then(results => res.status(200).json({status: "Ok"})).catch(err => {console.log(err); res.status(500).json({error: err})});
+app.post('/modificarCrucero', (req, res) => {
+    const id = req.body.id;
+    const patch = req.body.patch;
+
+    if (!!patch.aforo) patch.aforo=Number(patch.aforo)
+    if (!!patch.precio) patch.precio=Number(patch.precio)
+
+    //^ Validar que se proporcionen todos los campos requeridos 
+    if (!id) {
+      return res.status(400).json({ mensaje: 'Faltan campos requeridos' });
+    }
+
+  if(!!req.user){
+    if(req.user.rol === "empresa" && req.user.verificado){
+      const cruceroId = req.body.id;
+      Crucero.query().findById(cruceroId).then(r=> {
+        if(r.empresa_email===req.user.email){
+          //^ Guardar los datos del crucero en la base de datos 
+          Crucero.query().patch(
+            patch
+          ).findById(id).then(results => res.status(200).json({status: "Ok"})).catch(err => {console.log(err); res.status(500).json({error: err})});
+        }else{
+          res.status(401).json({error:'No autorizado'});
+        }
+      }).catch(err => res.status(404).json({error:"No se ha encontrado el crucero"}));
+  }else{
+    res.status(401).json({error:'No autorizado'});
+  }
+  }else{
+  res.status(401).json({error:'No autenticado'});
+  }
 });
 
 
 // TODO Endpoint: POST /BORRAR CRUCERO --> Ok ========================================================================================
-app.post('/borrarCrucero', async (req, res) => {
-  const cruceroId = req.body.id;
-  Crucero.query().deleteById(cruceroId).then(results => res.status(200).json({status: "OK"})).catch(err => res.status(500).json({error: err}));
+app.post('/borrarCrucero', 
+(req, res) => {
+  if(!!req.user){
+    if(req.user.rol === "empresa" && req.user.verificado){
+      const cruceroId = req.body.id;
+      Crucero.query().findById(cruceroId).then(r=> {
+        if(r.empresa_email===req.user.email){
+          Crucero.query().deleteById(cruceroId).then(results => res.status(200).json({status: "OK"})).catch(err => res.status(500).json({error: err}));
+        }else{
+          res.status(401).json({error:'No autorizado'});
+        }
+      }).catch(err => res.status(404).json({error:"No se ha encontrado el crucero"}));
+  }else{
+    res.status(401).json({error:'No autorizado'});
+  }
+  }else{
+  res.status(401).json({error:'No autenticado'});
+  }
   });
 
 
 // TODO  Endpoint: GET / LISTADO CRUCEROS QUE NO HAYAN PASADO DE FECHA =====================================================================
-app.get('/crucerosDisponibles', async (req, res) => {
-  try {
+app.get('/crucerosDisponibles', (req, res) => {
     // Obtener los eventos disponibles (que no hayan pasado)
-    const eventos = await Crucero.query();
+    const hoy = new Date();
+    hoy.setDate(hoy.getDate()+2);
+    const limite = hoy;
 
-    res.status(200).json(eventos);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener los eventos disponibles' });
+    Crucero.query().where('fecha','>',limite).then(r=>res.status(200).json(r)).catch(()=>
+    res.status(500).json({ error: 'Error al obtener los eventos disponibles' }))
   }
-});
+);
 
 
 // ! BORRADOR =======================================================================================
@@ -373,7 +494,11 @@ const encryptData = (data) => {
 // ! BORRADOR =======================================================================================
 //! Endpoint para comprar billetes
 app.post('/comprarBilletes', async (req, res) => {
-  const { cruceroId, cantidadBilletes, datosTarjeta } = req.body;
+
+  const datastr = CryptoES.AES.decrypt(req.body.encriptado,"secreto").toString(CryptoES.enc.Utf8);
+  const data = JSON.parse(datastr);
+
+  const { cruceroId, cantidadBilletes, datosTarjeta } = data;
 
   // Validar que se proporcionen todos los campos requeridos
   if (!cruceroId || !cantidadBilletes || !datosTarjeta) {
@@ -404,42 +529,40 @@ app.post('/comprarBilletes', async (req, res) => {
       return res.status(400).json({ mensaje: 'No hay suficientes billetes disponibles' });
     }
 
-    // Realizar el proceso de compra de billetes
-    crucero.aforo -= cantidadBilletes;
-    await crucero.$query().patch();
+    const precio = crucero.precio * cantidadBilletes;
 
-    // Crear la estructura de datos deseada
-    const misDatos = {
-      cruceroId: parseInt(cruceroId),
-      cantidadBilletes: parseInt(cantidadBilletes),
-      datosTarjeta: {
-        cardNumber: datosTarjeta.cardNumber,
-        cvv: datosTarjeta.cvv,
-        expiresOn: datosTarjeta.expiresOn
-      }
-    };
+    const response = await axios.post('https://pse-payments-api.ecodium.dev/payment', {
+      clientId: "0",
+      paymentDetails:{
+          creditCard:datosTarjeta,
+          totalAmount: precio.toString()
+          }
+    });
 
-    // Convertir a JSON y luego a base64
-    const miString = JSON.stringify(misDatos);
-    const secure = Buffer.from(miString).toString('base64');
+    if(!!response.data.success){
+      // Guardar la información de la compra en la base de datos
+      const compra = {
+        cruceroid:cruceroId,
+        cantidadbilletes:cantidadBilletes,
+        cardnumber:datosTarjeta.cardNumber,
+        cvv:datosTarjeta.cvv,
+        expireson:datosTarjeta.expiresOn,
+      };
 
-    //const secureReverse = JSON.parse(Buffer.from(secure, 'base64'));
-    console.log(secure);
-
-    // Guardar la información de la compra en la base de datos
-    const compra = {
-      cruceroId,
-      cantidadBilletes,
-      datosTarjeta: datosTarjetaCifrados,
-    };
-
-    await Compra.query().insert(compra);
-
-    // Enviar una respuesta exitosa al cliente
-    res.status(200).json({ mensaje: 'Billetes comprados exitosamente' });
+      await Compra.query().insert(compra);
+      crucero.aforo -= cantidadBilletes;
+      await crucero.$query().patch({aforo:crucero.aforo});
+      
+      // Enviar una respuesta exitosa al cliente
+      res.status(200).json(response.data);
+    }
+  else{
+      done({status:400, error: response.data.errors})
+  }
   } catch (error) {
     // Manejar cualquier error que ocurra durante el proceso de compra
     console.log(error);
+    console.log(error?.response?.data?.errors);
     res.status(500).json({ mensaje: 'Error al realizar la compra de los billetes' });
   }
 });
@@ -524,44 +647,6 @@ const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
   unsecurePassword: password
   }).then(results => res.status(200).json({status: "Ok"})).catch(err => res.status(500).json({error: err}));
 });*/
-
-// TODO Endpoint: GET /LISTADO EMPRESAS NO VERIFICADAS ============================================
-app.get('/empresasNoVerificadas', async (req, res) => {
-  try {
-    // Obtener todas las empresas no verificadas de la base de datos
-    const empresasNoVerificadas = await Empresa.query().where('verificado', false);
-
-    res.status(200).json(empresasNoVerificadas);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener las empresas no verificadas' });
-  }
-});
-
-// TODO Endpoint: GET /LISTADO EMPRESAS  ============================================
-app.get('/empresasLista', async (req, res) => {
-  try {
-    // Obtener todas las empresas de la base de datos
-    const empresas = await Empresa.query();
-
-    res.status(200).json(empresas);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener las empresas' });
-  }
-});
-
-
-// TODO Endpoint: GET / AUTORIZAR UNA EMPRESA =========================================
-app.post('/verificarEmpresa', async (req, res) => {
-  const empresaId = req.body.id;
-  
-  try {
-    await Empresa.query().findOne({ email: empresaId }).patch({ verificado: true });
-    res.status(200).json({ status: 'OK' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al marcar la empresa como verificada' });
-  }
-});
-
 
 
 // Parámetros

@@ -3,8 +3,9 @@ import { Box, TextField, Button,Alert, FormControl } from '@mui/material';
 import axios from 'axios';
 
 import {useNavigate} from 'react-router-dom'
+import { useParams } from 'react-router-dom';
 
-export default function RegistrationFormU(props) {
+export default function ModificarCruceroForm(props) {
   const [nombre, setNombre] = React.useState('');
   const [puerto,  setPuerto] = React.useState('');
   const [ubicacion, setUbicacion] = React.useState('');
@@ -20,24 +21,29 @@ export default function RegistrationFormU(props) {
   const [error, setError] = React.useState(false);
 
   const navigate = useNavigate();
+  const {id} = useParams();
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const patch = {};
+    if (nombre!=='') patch.nombre=nombre;
+    if (puerto!=='') patch.puerto=puerto;
+    if (ubicacion!=='') patch.ubicacion=ubicacion;
+    if (aforo!=='') patch.aforo=aforo;
+    if (fecha!=='') patch.fecha=fecha;
+    if (descripcion!=='') patch.descripcion=descripcion;
+    if (hora!=='') patch.hora=hora;
+    if (precio!=='') patch.precio=precio;
     const data = {
-      nombre,
-      puerto,
-      ubicacion,
-      aforo,
-      fecha,
-      descripcion,
-      hora,
-      precio
+        id,
+        patch
     };
     
     axios
-      ({url:'http://localhost:8080/registrarCrucero',method:'POST',withCredentials:true, data:data})
+      ({url:'http://localhost:8080/modificarCrucero',method:'POST',withCredentials:true, data:data})
       .then((response) => {
         console.log(response.data);
+        navigate('/modificarCruceros');
       })
       .catch((error) => {
         if(error?.response?.data?.mensaje)
@@ -60,25 +66,23 @@ const onClose = ()=>{
         }
     <Box sx={{ width: '400px', p: 2 }}>
       <form onSubmit={handleSubmit}>
-        <FormControl variant="outlined" required fullWidth sx={{ mb: 2, width: '100%'}}>
+        <FormControl variant="outlined" fullWidth sx={{ mb: 2, width: '100%'}}>
           <TextField
-            required
             label="Nombre"
             value={nombre}
             onChange={(event) => setNombre(event.target.value)}
             sx={{ width: '100%' }}
           />
         </FormControl>
-        <FormControl variant="outlined" required fullWidth sx={{ mb: 2, width: '100%' }}>
+        <FormControl variant="outlined" fullWidth sx={{ mb: 2, width: '100%' }}>
           <TextField
-            required
             label="Puerto"
             value={ puerto}
             onChange={(event) =>  setPuerto(event.target.value)}
             sx={{ width: '100%' }}
           />
           </FormControl>
-          <FormControl variant="outlined" required fullWidth sx={{ mb: 2, width: '100%' }}>
+          <FormControl variant="outlined" fullWidth sx={{ mb: 2, width: '100%' }}>
             <TextField
               label="Ubicacion"
               value={ubicacion}
@@ -86,21 +90,19 @@ const onClose = ()=>{
               sx={{ width: '100%' }}
             />
           </FormControl>
-          <FormControl variant="outlined" required fullWidth sx={{ mb: 2, width: '100%' }}>
+          <FormControl variant="outlined" fullWidth sx={{ mb: 2, width: '100%' }}>
             <TextField
               label="Aforo"
-              required
               value={aforo}
               onChange={(event) => setAforo(event.target.value)}
               sx={{ width: '100%' }}
             />
           </FormControl>
-          <FormControl variant="outlined" required fullWidth sx={{ mb: 2, width: '100%' }}>
+          <FormControl variant="outlined" fullWidth sx={{ mb: 2, width: '100%' }}>
             <TextField
               id="fecha"
               label="Fecha"
               type="date"
-              required
               InputLabelProps={{
                 shrink: true,
               }}
@@ -115,18 +117,16 @@ const onClose = ()=>{
               sx={{ mb: 2 }}
             />
           </FormControl>
-          <FormControl variant="outlined" required fullWidth sx={{ mb: 2, width: '100%' }}>
+          <FormControl variant="outlined" fullWidth sx={{ mb: 2, width: '100%' }}>
             <TextField
               label="Descripcion"
-              required
               value={descripcion}
               onChange={(event) => setDescripcion(event.target.value)}
               sx={{ width: '100%' }}
             />
           </FormControl>
-        <FormControl variant="outlined" required fullWidth sx={{ mb: 2, width: '100%' }}>
+        <FormControl variant="outlined" fullWidth sx={{ mb: 2, width: '100%' }}>
           <TextField
-            required
             label="Hora"
             type="hora"
             value={hora}
@@ -134,9 +134,8 @@ const onClose = ()=>{
             sx={{ width: '100%' }}
           />
         </FormControl>
-        <FormControl variant="outlined" required fullWidth sx={{ mb: 2, width: '100%' }}>
+        <FormControl variant="outlined" fullWidth sx={{ mb: 2, width: '100%' }}>
           <TextField
-            required
             label="Precio"
             type="precio"
             value={precio}
@@ -146,7 +145,7 @@ const onClose = ()=>{
         </FormControl>
         
         <FormControl fullWidth sx={{ mb: 2 }}>
-            <Button variant="contained" type="submit" sx={{ width: '100%', mt: 2 }}>Registrar</Button>
+            <Button variant="contained" type="submit" sx={{ width: '100%', mt: 2 }}>Modificar</Button>
       </FormControl>
       </form>
     </Box>

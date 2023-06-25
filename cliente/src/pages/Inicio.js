@@ -10,7 +10,7 @@ import { TemaContext,LoginContext } from "../App";
 export default function Inicio(){
 
     const tema = useContext(TemaContext);
-    const {rol,carga} = useContext(LoginContext);
+    const {rol,carga,verificado} = useContext(LoginContext);
 
     return <Box
         sx={{
@@ -45,6 +45,26 @@ export default function Inicio(){
                 <Button component={Link} to='/borrarEmpresas' variant="contained" sx={{flexGrow:0.5}}>Eliminar Empresas</Button>
                 <Button component={Link} to='/validarEmpresas' variant="contained" sx={{flexGrow:0.5}}>Validar Empresas</Button>
             </Box></>}
+
+            {!!carga && rol==='empresa' && verificado && <>
+            <Typography variant="h3" sx={{color:tema.text, fontWeight:"bold"}}>
+                Opciones de empresa
+            </Typography>
+            <Box sx={{
+                display :"flex",
+                direction: "row",
+                width:"100%"
+            }}>
+                <Button component={Link} to='/registrar/crucero' variant="contained" sx={{flexGrow:0.3}}>Registrar Crucero</Button>
+                <Button component={Link} to='/borrarCruceros' variant="contained" sx={{flexGrow:0.3}}>Borrar Cruceros</Button>
+                <Button component={Link} to='/modificarCruceros' variant="contained" sx={{flexGrow:0.3}}>Modificar Cruceros</Button>
+
+            </Box></>}
+
+            {!!carga && rol==='empresa' && !verificado && <>
+            <Typography variant="h3" sx={{color:tema.text, fontWeight:"bold"}}>
+                Pendiente de verificación por parte de un administrador-
+            </Typography></>}
 
         </Box>
         </Box>

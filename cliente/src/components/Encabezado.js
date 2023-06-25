@@ -1,17 +1,18 @@
-import {AppBar,Typography} from "@mui/material"
-import {Menu,MenuItem, MenuList} from '@mui/material';
+import {AppBar,Typography,Box} from "@mui/material"
 import IconButton from '@mui/material/IconButton';
 import Button from "@mui/material/Button";
 import HomeIcon from '@mui/icons-material/Home';
 import { useState,useContext } from "react";
 import { TemaContext,LoginContext } from "../App";
 
+import axios from "axios";
+
 import PersonIcon from '@mui/icons-material/Person';
 
 export default function Encabezado(){
 
     const tema = useContext(TemaContext);
-    const {carga,rol} = useContext(LoginContext)
+    const {carga,rol,setCarga} = useContext(LoginContext)
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -57,6 +58,42 @@ export default function Encabezado(){
             <Button sx={{marginLeft:"auto"}} href="/login" endIcon={<PersonIcon/>}>
             Identificate
             </Button>
+        }
+
+        {carga && (rol!=='no') &&
+            <Box sx={{marginLeft:"auto", display:"flex", flexDirection:"row", width:"fit-content"}}>
+                <Button variant="contained" onClick={()=>{
+                    axios({
+                        url:'http://localhost:8080/logout',
+                        method: 'GET',
+                        withCredentials: true,
+                    }).then(()=>{
+                        setCarga(false);
+                    }).catch(err=>console.log(err));
+                }} endIcon={<PersonIcon/>}>
+                Cerrar sesión
+                </Button>
+                { (rol==='empresa' || rol==='cliente') &&
+                <Button variant="contained" onClick={()=>{
+                    const url = (rol==='cliente') ? 'http://localhost:8080/borrarCliente' :  'http://localhost:8080/borrarEmpresa';
+                    axios({
+                        url:url,
+                        method: 'POST',
+                        withCredentials: true,
+                    }).then(()=>{
+                        axios({
+                            url:'http://localhost:8080/logout',
+                            method: 'GET',
+                            withCredentials: true,
+                        }).then(()=>setCarga(false)).catch((err)=>{
+                            console.log(err);
+                        });
+                    }).catch(err=>console.log(err));
+                }} endIcon={<PersonIcon/>}>
+                Borrar Cuenta
+                </Button>
+                }
+            </Box>
         }
     </AppBar>
 }
